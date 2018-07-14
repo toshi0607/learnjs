@@ -68,11 +68,18 @@
       display: inline-block;
     }
 
+    .navbar-padding {
+      padding-top: 7px;
+      display: inline-block;
+    }
+
     .text-lg {
       font-size: 32px;
     }
   </style>
   </style>
+  <meta name="google-signin-client_id" content="803366057749-c8uv4allhm3dre7e4lil2uusjh0sgodq.apps.googleusercontent.com">
+  <script src="https://apis.google.com/js/platform.js" async defer></script>
 </head>
 
 <body>
@@ -86,6 +93,11 @@
           <a href="#problem-1">Start</a>
         </li>
       </ul>
+      <div class='four columns'>
+        <span class='navbar-padding u-pull-right'>
+          <span class="g-signin2" data-onsuccess="googleSignIn"></span>
+        </span>
+      </div>
     </div>
     <div class='view-container container'>
     </div>
