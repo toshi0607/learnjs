@@ -1,7 +1,7 @@
-'use strict';
+"use strict";
 
 var learnjs = {
-  poolId: 'us-east-1:145d749d-c45f-4a0d-9012-c5398a12221f'
+  poolId: 'us-east-1:36d57728-65cc-4252-8884-75de73554d00'
 };
 
 learnjs.identity = new $.Deferred();
@@ -31,6 +31,12 @@ learnjs.applyObject = function(obj, elem) {
   }
 };
 
+learnjs.addProfileLink = function(profile) {
+  var link = learnjs.template('profile-link');
+  link.find('a').text(profile.email);
+  $('.signin-bar').prepend(link);
+}
+
 learnjs.flashElement = function(elem, content) {
   elem.fadeOut('fast', function() {
     elem.html(content);
@@ -52,7 +58,7 @@ learnjs.buildCorrectFlash = function (problemNum) {
 
 learnjs.problemView = function(data) {
   var problemNumber = parseInt(data, 10);
-  var view = $('.templates .problem-view').clone();
+  var view = learnjs.template('problem-view');
   var problemData = learnjs.problems[problemNumber - 1];
   var resultFlash = view.find('.result');
 
@@ -91,14 +97,23 @@ learnjs.landingView = function() {
   return learnjs.template('landing-view');
 }
 
+learnjs.profileView = function() {
+  var view = learnjs.template('profile-view');
+  learnjs.identity.done(function(identity) {
+    view.find('.email').text(identity.email);
+  });
+  return view;
+}
+
 learnjs.showView = function(hash) {
   var routes = {
     '#problem': learnjs.problemView,
+    '#profile': learnjs.profileView,
     '#': learnjs.landingView,
     '': learnjs.landingView
   };
   var hashParts = hash.split('-');
-  var viewFn = routes[hashParts[0]]
+  var viewFn = routes[hashParts[0]];
   if (viewFn) {
     learnjs.triggerEvent('removingView', []);
     $('.view-container').empty().append(viewFn(hashParts[1]));
@@ -110,6 +125,7 @@ learnjs.appOnReady = function() {
     learnjs.showView(window.location.hash);
   };
   learnjs.showView(window.location.hash);
+  learnjs.identity.done(learnjs.addProfileLink);
 }
 
 learnjs.awsRefresh = function() {
@@ -124,7 +140,7 @@ learnjs.awsRefresh = function() {
   return deferred.promise();
 }
 
-function googleSignIn() {
+function googleSignIn(googleUser) {
   var id_token = googleUser.getAuthResponse().id_token;
   AWS.config.update({
     region: 'us-east-1',
